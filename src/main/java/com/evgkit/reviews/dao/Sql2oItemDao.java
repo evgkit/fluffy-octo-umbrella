@@ -33,6 +33,10 @@ public class Sql2oItemDao implements ItemDao {
 
     @Override
     public List<Item> findAll() {
-        return null;
+        try (Connection connection = sql2o.open()) {
+            return connection
+                .createQuery("SELECT * FROM items")
+                .executeAndFetch(Item.class);
+        }
     }
 }
