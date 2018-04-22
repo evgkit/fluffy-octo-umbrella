@@ -9,4 +9,6 @@ public interface ItemDao {
     void add(Item item) throws DaoException;
 
     List<Item> findAll();
+
+    Item findById(int id);
 }

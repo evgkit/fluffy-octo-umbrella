@@ -39,4 +39,14 @@ public class Sql2oItemDao implements ItemDao {
                 .executeAndFetch(Item.class);
         }
     }
+
+    @Override
+    public Item findById(int id) {
+        try (Connection connection = sql2o.open()) {
+            return connection
+                .createQuery("SELECT * FROM items WHERE id = :id")
+                .addParameter("id", id)
+                .executeAndFetchFirst(Item.class);
+        }
+    }
 }
