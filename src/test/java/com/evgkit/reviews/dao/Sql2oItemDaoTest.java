@@ -28,7 +28,7 @@ public class Sql2oItemDaoTest {
     }
 
     @Test
-    public void testAdd_adding_item_sets_id() throws Exception {
+    public void adding_item_sets_id() throws Exception {
         Item item = newTestItem();
         int originalItemId = item.getId();
         dao.add(item);
@@ -37,7 +37,7 @@ public class Sql2oItemDaoTest {
     }
 
     @Test
-    public void testFindAll_added_items_are_returned_from_find_all() throws Exception {
+    public void added_items_are_returned_from_find_all() throws Exception {
         Item item = newTestItem();
         dao.add(item);
 
@@ -45,12 +45,12 @@ public class Sql2oItemDaoTest {
     }
 
     @Test
-    public void testFindAll_no_items_returns_empty_list() throws Exception {
+    public void no_items_returns_empty_list() throws Exception {
         assertEquals(0, dao.findAll().size());
     }
 
     @Test
-    public void testFindById_existing_items_can_be_founded_by_id() throws Exception {
+    public void existing_items_can_be_founded_by_id() throws Exception {
         Item item = newTestItem();
         dao.add(item);
         Item foundItem = dao.findById(item.getId());
