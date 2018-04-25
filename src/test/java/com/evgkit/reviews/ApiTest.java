@@ -3,17 +3,20 @@ package com.evgkit.reviews;
 import static org.junit.Assert.*;
 
 import com.evgkit.reviews.dao.Sql2oItemDao;
+import com.evgkit.reviews.dao.Sql2oReviewDao;
 import com.evgkit.reviews.model.Item;
+import com.evgkit.reviews.model.Review;
 import com.evgkit.testing.ApiClient;
 import com.evgkit.testing.ApiResponse;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.junit.*;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import spark.Spark;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public class ApiTest {
 
@@ -24,6 +27,7 @@ public class ApiTest {
     private ApiClient client;
     private Gson gson;
     private Sql2oItemDao itemDao;
+    private Sql2oReviewDao reviewDao;
 
     @BeforeClass
     public static void startServer() {
@@ -43,6 +47,7 @@ public class ApiTest {
                 "");
 
         itemDao = new Sql2oItemDao(sql2o);
+        reviewDao = new Sql2oReviewDao(sql2o);
 
         connection = sql2o.open();
 
@@ -78,9 +83,65 @@ public class ApiTest {
     }
 
     @Test
-    public void missing_utems_return_not_found_status() {
+    public void missing_items_return_not_found_status() {
         ApiResponse response = client.request("GET", "/items/100500");
         assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    public void adding_reviews_return_created_status() throws Exception {
+        Item item = newTestItem();
+        itemDao.add(item);
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("rating", 5);
+        values.put("comment", "Test comment");
+
+        ApiResponse response = client.request("POST",
+                String.format("/items/%d/reviews", item.getId()),
+                gson.toJson(values));
+
+        assertEquals(201, response.getStatus());
+    }
+
+    @Test
+    public void adding_review_to_missing_item_throws_error() throws Exception {
+        Map<String, Object> values = new HashMap<>();
+        values.put("rating", 5);
+        values.put("comment", "Test comment");
+
+        ApiResponse response = client.request("POST",
+                "/items/100500/reviews",
+                gson.toJson(values));
+
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    public void multiple_reviews_can_be_returned_by_item_id() throws Exception {
+        Item item = newTestItem();
+        itemDao.add(item);
+
+        List<Review> originalReviews = Arrays.asList(
+                new Review(item.getId(), 5, "Awesome!"),
+                new Review(item.getId(), 1, "Sucks!")
+        );
+
+        for (Review review : originalReviews) {
+            reviewDao.add(review);
+        }
+        // reviewDao.add(new Review(item.getId(), 4, "So-so"));
+
+        ApiResponse response = client.request("GET",
+                String.format("/items/%d/reviews", item.getId()));
+
+        List<Review> retrievedReviews = gson.fromJson(
+                response.getBody(),
+                new TypeToken<List<Review>>() {
+                }.getType()
+        );
+
+        assertEquals(originalReviews, retrievedReviews);
     }
 
     private Item newTestItem() {

@@ -21,13 +21,13 @@ public class Sql2oItemDao implements ItemDao {
         String sql = "INSERT INTO items(name, url) VALUES (:name, :url)";
         try (Connection connection = sql2o.open()) {
             int id = (int) connection
-                .createQuery(sql)
-                .bind(item)
-                .executeUpdate()
-                .getKey();
+                    .createQuery(sql)
+                    .bind(item)
+                    .executeUpdate()
+                    .getKey();
             item.setId(id);
-        } catch (Sql2oException ex) {
-            throw new DaoException(ex, "Problem adding item");
+        } catch (Sql2oException e) {
+            throw new DaoException(e, "Problem adding item");
         }
     }
 
@@ -35,8 +35,8 @@ public class Sql2oItemDao implements ItemDao {
     public List<Item> findAll() {
         try (Connection connection = sql2o.open()) {
             return connection
-                .createQuery("SELECT * FROM items")
-                .executeAndFetch(Item.class);
+                    .createQuery("SELECT * FROM items")
+                    .executeAndFetch(Item.class);
         }
     }
 
@@ -44,9 +44,9 @@ public class Sql2oItemDao implements ItemDao {
     public Item findById(int id) {
         try (Connection connection = sql2o.open()) {
             return connection
-                .createQuery("SELECT * FROM items WHERE id = :id")
-                .addParameter("id", id)
-                .executeAndFetchFirst(Item.class);
+                    .createQuery("SELECT * FROM items WHERE id = :id")
+                    .addParameter("id", id)
+                    .executeAndFetchFirst(Item.class);
         }
     }
 }

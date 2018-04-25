@@ -16,8 +16,10 @@ public class Sql2oItemDaoTest {
 
     @Before
     public void setUp() throws Exception {
-        String connectionString = "jdbc:h2:mem:testing;INIT=RUNSCRIPT from 'classpath:db/init.sql'";
-        Sql2o sql2o = new Sql2o(connectionString, "", "");
+        Sql2o sql2o = new Sql2o(
+                "jdbc:h2:mem:testing;INIT=RUNSCRIPT from 'classpath:db/init.sql'",
+                "",
+                "");
         dao = new Sql2oItemDao(sql2o);
         connection = sql2o.open();
     }
