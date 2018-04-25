@@ -12,10 +12,13 @@ import static spark.Spark.get;
 
 public class Api {
     public static void main(String[] args) {
-        String connectionString = "jdbc:h2:mem:~/items.db;INIT=RUNSCRIPT from 'classpath:db/init.sql'";
-        Sql2o sql2o = new Sql2o(connectionString, "", "");
+      Sql2o sql2o = new Sql2o(
+          "jdbc:h2:~/items.db;INIT=RUNSCRIPT from 'classpath:db/init.sql'",
+          "",
+          "");
         ItemDao itemDao = new Sql2oItemDao(sql2o);
-        Gson gson = new Gson();
+
+      Gson gson = new Gson();
 
         post("/items", "application/json",
             (request, response) -> {
